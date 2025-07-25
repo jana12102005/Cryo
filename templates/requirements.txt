@@ -1,4 +1,0 @@
-Flask
-pymongo
-Flask-Mail
-gunicorn
