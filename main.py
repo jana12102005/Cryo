@@ -12,23 +12,22 @@ app.secret_key = 'cryo_em_secret_key_mongodb'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)
 
 # --- Email Configuration ---
-# For production, set these as environment variables in Render
+# For production, set these as environment variables
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'palanivelu1971r@gmail.com')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'tpritehworwyollc')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'palanivelu1971r@gmail.com')
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'your_email@gmail.com') # Replace with your email
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'your_app_password') # Replace with your app password
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'your_email@gmail.com') # Replace with your email
 mail = Mail(app)
 
 # --- MongoDB Connection Setup ---
-# For production, set this as an environment variable in Render
-# Temporarily hardcode your real connection string for local testing
-MONGO_URI = 'mongodb+srv://cryoemiisc:GZWpObsk1L7vIydQ@allregesterdata.eygquiu.mongodb.net/cryo_em_db?retryWrites=true&w=majority&appName=ALLREGESTERDATA'
+# For production, set this as an environment variable
+MONGO_URI = os.environ.get('MONGO_URI', 'mongodb+srv://cryoemiisc:GZWpObsk1L7vIydQ@allregesterdata.eygquiu.mongodb.net/cryo_em_db?retryWrites=true&w=majority&appName=ALLREGESTERDATA')
 client = MongoClient(MONGO_URI)
 db = client.cryo_em_db
 
-# Define collections (equivalent to your old Excel files)
+# Define collections
 registrations_collection = db.registrations
 history_collection = db.history
 users_collection = db.users
@@ -79,6 +78,11 @@ def team():
 def facility():
     return render_template('facility.html')
 
+# --- THIS ROUTE IS NOW ACTIVE ---
+@app.route('/equipments')
+def equipments():
+    return render_template('equipments.html')
+
 # --- Data-Driven Routes ---
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -99,7 +103,6 @@ def register():
         
         position = registrations_collection.count_documents({'status': 'waiting'})
         
-        # --- UPDATED REGISTRATION EMAIL BODY ---
         subject = "Cryo-EM Slot Registration Confirmation"
         body = f"""
 Dear {new_registration['user_name']},
@@ -140,6 +143,7 @@ def admin():
         admin_user = users_collection.find_one({'username': username})
         
         if admin_user and check_password_hash(admin_user['password'], password):
+            session.permanent = True
             session['admin_logged_in'] = True
             return redirect(url_for('admin_panel'))
         
@@ -170,7 +174,6 @@ def load_registration(doc_id):
 
     registration = registrations_collection.find_one({'_id': ObjectId(doc_id)})
     if registration:
-        # --- UPDATED LOAD EMAIL BODY ---
         subject = "Cryo-EM Slot Loaded"
         body = """
 Dear {user_name},
@@ -197,7 +200,6 @@ def complete_registration(doc_id):
         registration['completion_date'] = datetime.datetime.now().strftime('%Y-%m-%d')
         history_collection.insert_one(registration)
 
-        # --- UPDATED COMPLETED EMAIL BODY ---
         subject = "Cryo-EM Slot Completed"
         body = """
 Dear {user_name},
@@ -248,4 +250,4 @@ def check_admin_session():
             session.pop('admin_logged_in', None)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)

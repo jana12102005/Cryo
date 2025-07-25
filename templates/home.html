@@ -65,7 +65,7 @@
         .top-buttons {
             position: absolute;
             top: 10px;
-            right: 10px;
+            right: -1px;
             display: flex;
             gap: 20px;
             z-index: 1;
@@ -79,7 +79,7 @@
         }
 
         .top-buttons a i {
-            padding: 5px;
+            padding: 4px;
             transition: transform 0.2s ease, color 0.2s ease;
         }
 
@@ -204,21 +204,12 @@
 
         <div class="container">
              <div class="top-buttons">
-    
-                <a href="{{ url_for('index') }}" title="Home">
-                <i class="fas fa-home"></i>
-                </a>
-                <a href="{{ url_for('about') }}" title="About">
-                <i class="fas fa-info-circle"></i>
-                </a>
-                <a href="{{ url_for('facility') }}" title="Facility">
-                <i class="fas fa-microscope"></i>
-                </a>
-                <a href="{{ url_for('team') }}" title="Team">
-                <i class="fas fa-users"></i>
-                </a>
-   
-        </div>
+        <a href="{{ url_for('home') }}" title="Home"><i class="fas fa-home"></i></a>
+        <a href="{{ url_for('about') }}" title="About"><i class="fas fa-info-circle"></i></a>
+        <a href="{{ url_for('facility') }}" title="Facility"><i class="fas fa-microscope"></i></a>
+        <a href="{{ url_for('team') }}" title="Team"><i class="fas fa-users"></i></a>
+        <a href="{{ url_for('equipments') }}" title="Equipments"><i class="fas fa-tools"></i></a>
+      </div>
             <div class="slideshow-container">
                 <div class="slideshow">
                     {% for image in slideshow_images %}
